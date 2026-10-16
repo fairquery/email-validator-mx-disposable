@@ -88,7 +88,7 @@ Read dataset items (`type == "email"`) and the `RUN_SUMMARY` record. A standalon
 
 ## Local stdio MCP server
 
-This repo ships a **stdio MCP server** (TypeScript, `@modelcontextprotocol/sdk`) under [`mcp/`](./mcp) exposing one tool, `validate_emails`, which runs this Actor through the Apify API. `initialize` and `tools/list` work **without** a token; tool calls require `APIFY_TOKEN` (billed per the Store pricing).
+This repo ships a **stdio MCP server** (TypeScript, `@modelcontextprotocol/sdk`) under [`mcp/`](./mcp) exposing `validate_emails` (runs this Actor through the Apify API) and the free offline `check_email_syntax`. `initialize` and `tools/list` work **without** a token; tool calls require `APIFY_TOKEN` (billed per the Store pricing).
 
 ```bash
 cd mcp && npm install && npm run build
@@ -100,7 +100,7 @@ APIFY_TOKEN=... node scripts/smoke-test.mjs --call   # real tool call
 { "mcpServers": { "fairquery-email": { "command": "node", "args": ["/path/to/email-validator-mx-disposable/mcp/dist/index.js"], "env": { "APIFY_TOKEN": "<your Apify token>" } } } }
 ```
 
-Docker: `docker build -f Dockerfile.mcp -t fairquery-email-mcp .` (build context = repo root; also the Dockerfile for Glama). `glama.json` lists `fairquery` as maintainer.
+Docker: `docker build -t fairquery-email-mcp .` (the repo-root `Dockerfile` builds this MCP server and is what Glama uses; the Apify Actor image is built from `.actor/Dockerfile`). `glama.json` lists `fairquery` as maintainer.
 
 ## Links
 

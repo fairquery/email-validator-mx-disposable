@@ -1,0 +1,69 @@
+{
+    "$schema": "https://apify.com/schemas/v1/input.ide.json",
+    "title": "Email Validator",
+    "description": "Validate emails via syntax + DNS (no SMTP probing, no emails sent).",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "emails": {
+            "title": "Emails",
+            "type": "array",
+            "editor": "stringList",
+            "description": "Email addresses to validate. Entries may also be comma/semicolon/newline separated lists or 'Name <addr>' forms.",
+            "default": [
+                "john.doe@gmail.com",
+                "info@apify.com",
+                "someone@gmial.com",
+                "test@mailinator.com",
+                "not-an-email",
+                "user@this-domain-does-not-exist-fq123.com"
+            ],
+            "prefill": [
+                "john.doe@gmail.com",
+                "info@apify.com",
+                "someone@gmial.com",
+                "test@mailinator.com",
+                "not-an-email",
+                "user@this-domain-does-not-exist-fq123.com"
+            ]
+        },
+        "checkDns": {
+            "title": "Check DNS (MX)",
+            "type": "boolean",
+            "description": "Look up MX / A records over DNS-over-HTTPS to confirm the domain can receive mail.",
+            "default": true
+        },
+        "checkSpfDmarc": {
+            "title": "Check SPF / DMARC",
+            "type": "boolean",
+            "description": "Also report SPF and DMARC presence and DMARC policy for each domain.",
+            "default": true
+        },
+        "allowRoleAccounts": {
+            "title": "Treat role accounts as valid",
+            "type": "boolean",
+            "description": "If false, role addresses (info@, sales@, support@\u2026) get verdict 'risky'.",
+            "default": true
+        },
+        "allowDisposable": {
+            "title": "Treat disposable domains as valid",
+            "type": "boolean",
+            "description": "If false, disposable/temporary inbox domains get verdict 'risky'.",
+            "default": false
+        },
+        "allowFreeProviders": {
+            "title": "Treat free providers as valid",
+            "type": "boolean",
+            "description": "If false, free webmail (gmail.com, outlook.com\u2026) gets verdict 'risky' (useful for B2B lead lists).",
+            "default": true
+        },
+        "maxEmails": {
+            "title": "Max emails",
+            "type": "integer",
+            "description": "Safety cap on unique emails per run.",
+            "default": 10000,
+            "minimum": 1,
+            "maximum": 100000
+        }
+    }
+}

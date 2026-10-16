@@ -1,0 +1,30 @@
+{
+    "$schema": "https://apify.com/schemas/v1/actor.ide.json",
+    "actorSpecification": 1,
+    "name": "email-validator-mx-disposable",
+    "title": "Email Validator for Agents (MX, Disposable, Typo)",
+    "description": "Validate email addresses without sending mail: syntax, DNS/MX, null MX, disposable and role detection, free-provider flag, typo suggestions, SPF/DMARC. Clear valid/risky/invalid verdicts with reason codes for AI agents and CRM hygiene.",
+    "version": "1.0",
+    "buildTag": "latest",
+    "meta": {
+        "templateId": "ts-empty",
+        "generatedBy": "Grok Bot"
+    },
+    "defaultRunOptions": {
+        "build": "latest",
+        "memoryMbytes": 256,
+        "timeoutSecs": 900
+    },
+    "minMemoryMbytes": 256,
+    "maxMemoryMbytes": 1024,
+    "input": "./input_schema.json",
+    "inputSchema": "./input_schema.json",
+    "output": "./output_schema.json",
+    "outputSchema": "./output_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json",
+        "keyValueStore": "./key_value_store_schema.json"
+    },
+    "dockerfile": "../Dockerfile",
+    "readme": "../README.md"
+}

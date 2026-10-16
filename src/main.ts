@@ -9,7 +9,8 @@ import {
     suggestDomain,
     verdictOf,
 } from './checks.js';
-import { DohClient, dohUrl, type DomainDns,lookupDomain } from './dns.js';
+import { DohClient, dohUrl, type DomainDns, lookupDomain } from './dns.js';
+import { Emitter } from './emitter.js';
 import {
     type ActorInput,
     CHARGE_EVENTS,
@@ -25,8 +26,10 @@ import {
 await Actor.init();
 
 const aborting = { value: false };
-Actor.on('aborting', () => {
+const emitter = new Emitter();
+Actor.on('aborting', async () => {
     aborting.value = true;
+    await emitter.flush();
     log.warning('Aborting — stopping after current batch.');
 });
 
@@ -183,25 +186,16 @@ async function finish(): Promise<never> {
         dns_requests: client.requestCount,
         input: { ...input, emails: input.emails.length > 50 ? [`<${input.emails.length} emails>`] : input.emails },
     };
+    await emitter.flush();
     await Actor.setValue('RUN_SUMMARY', summary);
     await Actor.exit();
     return undefined as never;
 }
 
 async function emit(row: OutputRow, eventName: string): Promise<void> {
-    await Actor.pushData(row);
-    // Only charge when the run is on pay-per-event pricing (Store monetization approved).
-    try {
-        const pricing = Actor.getChargingManager().getPricingInfo();
-        if (!pricing.isPayPerEvent) return;
-        const result = await Actor.charge({ eventName });
-        if (result.eventChargeLimitReached) {
-            log.warning(`Charge limit reached for ${eventName}`);
-            aborting.value = true;
-        }
-    } catch (e) {
-        log.debug(`Actor.charge skipped/failed for ${eventName}: ${e instanceof Error ? e.message : String(e)}`);
-    }
+    // Batched push + charge; Actor.charge only runs when the run is pay-per-event (see emitter.ts).
+    await emitter.emit(row, eventName);
+    if (emitter.limitReached) aborting.value = true;
 }
 
 /** Error rows are never charged. */
@@ -216,5 +210,5 @@ async function pushError(
         checked_at: new Date().toISOString(),
         ...partial,
     };
-    await Actor.pushData(row);
+    await emitter.emit(row, null); // error rows are never charged
 }

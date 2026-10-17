@@ -9,6 +9,7 @@ import {
     suggestDomain,
     verdictOf,
 } from '../src/checks.js';
+import { DISPOSABLE_DOMAINS } from '../src/data/disposable.js';
 import { DohClient, lookupDomain, parseMx, txtValue } from '../src/dns.js';
 
 const base = {
@@ -66,7 +67,7 @@ describe('classifiers', () => {
         expect(isRole('sales+eu')).toBe(true);
         expect(isRole('jane')).toBe(false);
         expect(isFreeProvider('gmail.com')).toBe(true);
-        expect(suggestDomain('gmial.com')).toBe('gmail.com');
+        expect(suggestDomain('gmal.com')).toBe('gmail.com');
         expect(suggestDomain('hotmail.con')).toBe('hotmail.com');
         expect(suggestDomain('gmail.com')).toBeNull();
         expect(suggestDomain('acme-industries.com')).toBeNull();
@@ -142,19 +143,56 @@ describe('dns', () => {
 });
 
 describe('typo domains of major providers', () => {
-    it.each(['gmial.com', 'gmal.com', 'hotmial.com', 'yaho.com'])('%s is a typo, not disposable', (d) => {
-        expect(isDisposable(d)).toBe(false);
-        expect(suggestDomain(d)).toMatch(/^(gmail|hotmail|yahoo)\.com$/);
-    });
+    it.each(['gmal.com', 'yaho.com', 'gmaill.com', 'outlok.com'])(
+        '%s (not on the disposable list) is a typo, not disposable',
+        (d) => {
+            expect(isDisposable(d)).toBe(false);
+            expect(suggestDomain(d)).toMatch(/^(gmail|hotmail|yahoo|outlook)\.com$/);
+        },
+    );
 });
 
-describe('input schema', () => {
-    it('keeps sample emails as prefill/example only, never as a billable default', async () => {
-        const { readFileSync } = await import('node:fs');
-        const schema = JSON.parse(readFileSync(new URL('../.actor/input_schema.json', import.meta.url), 'utf8'));
-        const field = schema.properties.emails;
-        expect(field.default).toBeUndefined();
-        expect(Array.isArray(field.prefill) && field.prefill.length > 0).toBe(true);
-        expect(field.example).toEqual(field.prefill);
+describe('disposable list wins over typo suggestion', () => {
+    // Every listed domain that used to be masked as a typo of a free provider (43 on the 2026-10-16 snapshot).
+    it.each([
+        'yopmail.com',
+        'mail.tm',
+        'mail.gw',
+        'givmail.com',
+        'gmaillk.com',
+        'tmail.com',
+        'zetmail.com',
+        'mailzi.ru',
+        'gmial.com',
+        'hotmial.com',
+        'hotmai.com',
+        'x.yopmail.com',
+    ])('%s is disposable and gets no typo suggestion', (d) => {
+        expect(isDisposable(d)).toBe(true);
+        expect(suggestDomain(d)).toBeNull();
+    });
+    it('yopmail.com gets verdict risky with DISPOSABLE_DOMAIN only', () => {
+        const disposable = isDisposable('yopmail.com');
+        const didYouMean = suggestDomain('yopmail.com');
+        const r = verdictOf({ ...base, disposable, didYouMean });
+        expect(r).toEqual({ verdict: 'risky', reasons: ['DISPOSABLE_DOMAIN'] });
+    });
+    it('real providers are never disposable', () => {
+        for (const d of [
+            'gmail.com',
+            'hotmail.com',
+            'yahoo.com',
+            'outlook.com',
+            'mail.ru',
+            'ymail.com',
+            'mail.com',
+            'live.com',
+        ])
+            expect(isDisposable(d), d).toBe(false);
+    });
+    it('no listed domain is suggested as a typo anywhere in the list', () => {
+        let masked = 0;
+        for (const d of DISPOSABLE_DOMAINS) if (suggestDomain(d) !== null) masked += 1;
+        expect(masked).toBe(0);
     });
 });

@@ -142,6 +142,159 @@
                 ],
                 "title": "DMARC policy"
             },
+            "risk_score": {
+                "type": "integer",
+                "title": "Risk score v2 (0-100, higher = riskier)",
+                "description": "Heuristic pre-send risk score. No SMTP probing; not a mailbox verification."
+            },
+            "risk_level": {
+                "type": "string",
+                "title": "Risk level",
+                "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                ]
+            },
+            "risk_reasons": {
+                "type": "array",
+                "title": "Risk reason codes"
+            },
+            "risk_score_version": {
+                "type": "integer",
+                "title": "Risk score version"
+            },
+            "mail_provider_id": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Mail provider id"
+            },
+            "mx_provider_class": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "MX provider type",
+                "enum": [
+                    "consumer_webmail",
+                    "business_suite",
+                    "security_gateway",
+                    "hosting_or_forwarding",
+                    "disposable_service",
+                    "self_hosted_or_unrecognised",
+                    "none",
+                    null
+                ]
+            },
+            "catch_all_likelihood": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Catch-all likelihood (ESTIMATE)",
+                "description": "Estimate from the MX provider type, not measured. See catch_all_basis.",
+                "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "unknown",
+                    null
+                ]
+            },
+            "catch_all_basis": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Catch-all basis"
+            },
+            "domain_registered_at": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Domain registered at (RDAP)"
+            },
+            "domain_age_days": {
+                "type": [
+                    "integer",
+                    "null"
+                ],
+                "title": "Domain age (days)"
+            },
+            "domain_age_source": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Domain age source (RDAP URL)"
+            },
+            "disposable_infrastructure": {
+                "type": "boolean",
+                "title": "Shares MX with disposable-inbox services"
+            },
+            "disposable_infrastructure_mx": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Matching disposable MX host"
+            },
+            "mailbox_verified": {
+                "type": "boolean",
+                "title": "Mailbox verified",
+                "description": "false unless the optional BYOK MillionVerifier check returned ok or invalid with a live key."
+            },
+            "mailbox_check": {
+                "type": "string",
+                "title": "Mailbox check state",
+                "enum": [
+                    "not_requested",
+                    "checked",
+                    "skipped_invalid",
+                    "skipped_disposable",
+                    "skipped_limit",
+                    "error"
+                ]
+            },
+            "mailbox_status": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Mailbox status (BYOK)",
+                "enum": [
+                    "deliverable",
+                    "undeliverable",
+                    "catch_all",
+                    "disposable",
+                    "unknown",
+                    null
+                ]
+            },
+            "mailbox_provider": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Mailbox check provider"
+            },
+            "mailbox_raw": {
+                "type": [
+                    "object",
+                    "null"
+                ],
+                "title": "Raw MillionVerifier result (no key)"
+            },
+            "mailbox_error": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Mailbox check error code"
+            },
             "code": {
                 "type": "string",
                 "title": "Error code"
@@ -180,6 +333,11 @@
                     "is_disposable",
                     "is_role_account",
                     "is_free_provider",
+                    "risk_score",
+                    "risk_level",
+                    "catch_all_likelihood",
+                    "domain_age_days",
+                    "mailbox_verified",
                     "code"
                 ]
             },
@@ -215,6 +373,21 @@
                     },
                     "code": {
                         "label": "Error code"
+                    },
+                    "risk_score": {
+                        "label": "Risk score"
+                    },
+                    "risk_level": {
+                        "label": "Risk level"
+                    },
+                    "catch_all_likelihood": {
+                        "label": "Catch-all (estimate)"
+                    },
+                    "domain_age_days": {
+                        "label": "Domain age (days)"
+                    },
+                    "mailbox_verified": {
+                        "label": "Mailbox verified"
                     }
                 }
             }

@@ -1,8 +1,8 @@
 {
     "name": "email-validator-mx-disposable",
-    "version": "1.0.1",
+    "version": "2.0.0",
     "type": "module",
-    "description": "Email validation (syntax, MX, disposable) for AI agents (Fairquery).",
+    "description": "Email validation (syntax, MX, disposable, Risk Score v2, optional BYOK MillionVerifier mailbox check) for AI agents (Fairquery).",
     "engines": {
         "node": ">=20"
     },
@@ -27,7 +27,7 @@
         "start:prod": "node dist/main.js",
         "start:dev": "tsx src/main.ts",
         "build": "tsc",
-        "lint": "eslint",
+        "lint": "eslint src",
         "test": "vitest run"
     },
     "author": "Fairquery",

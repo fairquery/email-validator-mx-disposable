@@ -42,7 +42,7 @@ await withClient(baseEnv, async (client) => {
     }
     const noToken = await client.callTool({
         name: 'validate_emails',
-        arguments: { emails: ['john.doe@gmail.com', 'bob@gmial.com'] },
+        arguments: { emails: ['john.doe@gmail.com', 'bob@gamil.com'] },
     });
     const text = JSON.stringify(noToken);
     if (!text.includes('APIFY_TOKEN_MISSING')) {
@@ -61,7 +61,7 @@ if (doCall) {
         const result = await client.callTool({
             name: 'validate_emails',
             arguments: {
-                emails: ['john.doe@gmail.com', 'bob@gmial.com'],
+                emails: ['john.doe@gmail.com', 'bob@gamil.com'],
             },
         });
         if (result.isError) {

@@ -4,7 +4,7 @@
     "name": "email-validator-mx-disposable",
     "title": "Email Validator for Agents (MX, Disposable, Typo)",
     "description": "Validate email addresses without sending mail: syntax, DNS/MX, null MX, disposable and role detection, free-provider flag, typo suggestions, SPF/DMARC. Clear valid/risky/invalid verdicts with reason codes for AI agents and CRM hygiene.",
-    "version": "1.0",
+    "version": "2.0",
     "buildTag": "latest",
     "meta": {
         "templateId": "ts-empty",

@@ -7,14 +7,25 @@ import { Actor, log } from 'apify';
  * Rows are always saved before they are charged; rows with event=null (errors) are never charged.
  */
 export class Emitter {
-    private buf: { row: object; event: string | null }[] = [];
+    private buf: { row: object; events: string[] }[] = [];
+    /** Events charged successfully (as reported by the SDK), per event name. */
+    readonly charged: Record<string, number> = {};
+    /** Events queued in the buffer but not yet charged. */
+    pending(eventName: string): number {
+        return this.buf.reduce((n, b) => n + b.events.filter((e) => e === eventName).length, 0);
+    }
+
     private ppe: boolean | null = null;
     limitReached = false;
 
     constructor(private readonly batchSize = 100) {}
 
-    async emit(row: object, event: string | null): Promise<void> {
-        this.buf.push({ row, event });
+    /** events: one event name, several (charged once each), or null for rows that are never charged. */
+    async emit(row: object, event: string | string[] | null): Promise<void> {
+        let events: string[] = [];
+        if (Array.isArray(event)) events = event;
+        else if (event !== null) events = [event];
+        this.buf.push({ row, events });
         if (this.buf.length >= this.batchSize) await this.flush();
     }
 
@@ -25,10 +36,11 @@ export class Emitter {
         await Actor.pushData(batch.map((b) => b.row));
         if (!this.isPpe()) return;
         const counts = new Map<string, number>();
-        for (const b of batch) if (b.event) counts.set(b.event, (counts.get(b.event) ?? 0) + 1);
+        for (const b of batch) for (const e of b.events) counts.set(e, (counts.get(e) ?? 0) + 1);
         for (const [eventName, count] of counts) {
             try {
                 const res = await Actor.charge({ eventName, count });
+                this.charged[eventName] = (this.charged[eventName] ?? 0) + res.chargedCount;
                 if (res.eventChargeLimitReached) {
                     log.warning(`Charge limit reached for ${eventName}`);
                     this.limitReached = true;
@@ -39,7 +51,7 @@ export class Emitter {
         }
     }
 
-    private isPpe(): boolean {
+    isPpe(): boolean {
         if (this.ppe === null) {
             try {
                 this.ppe = Actor.getChargingManager().getPricingInfo().isPayPerEvent;

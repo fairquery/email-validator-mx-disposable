@@ -13,7 +13,7 @@
             "prefill": [
                 "john.doe@gmail.com",
                 "info@apify.com",
-                "someone@gmial.com",
+                "someone@gamil.com",
                 "test@mailinator.com",
                 "not-an-email",
                 "user@this-domain-does-not-exist-fq123.com"
@@ -21,7 +21,7 @@
             "example": [
                 "john.doe@gmail.com",
                 "info@apify.com",
-                "someone@gmial.com",
+                "someone@gamil.com",
                 "test@mailinator.com",
                 "not-an-email",
                 "user@this-domain-does-not-exist-fq123.com"
@@ -62,6 +62,35 @@
             "type": "integer",
             "description": "Safety cap on unique emails per run.",
             "default": 10000,
+            "minimum": 1,
+            "maximum": 100000
+        },
+        "checkDomainAge": {
+            "title": "Check domain age (RDAP)",
+            "type": "boolean",
+            "description": "Look up the domain's registration date over RDAP (servers from the IANA bootstrap only). Domains under 30 days old raise the risk score. Fails soft: unknown age is null.",
+            "default": true,
+            "sectionCaption": "Risk Score v2"
+        },
+        "cacheDomainAge": {
+            "title": "Cache domain age for 30 days",
+            "type": "boolean",
+            "description": "Store RDAP registration dates (domain names and dates only, no email addresses) in a named key-value store 'fairquery-email-rdap-cache' in your account, so repeat runs are faster. Turn off to keep nothing between runs.",
+            "default": true
+        },
+        "millionVerifierApiKey": {
+            "title": "MillionVerifier API key (optional, BYOK)",
+            "type": "string",
+            "editor": "textfield",
+            "isSecret": true,
+            "description": "Optional. Your own MillionVerifier API key (app.millionverifier.com/api). If set, emails that are not already invalid or disposable are also checked by MillionVerifier using YOUR credits, and each real result is charged the separate 'mailbox-checked-byok' event. The key is encrypted by Apify, never logged, and never written to the dataset, key-value store or run summary. Emails are sent to MillionVerifier (your processor).",
+            "sectionCaption": "Optional mailbox check (bring your own key)"
+        },
+        "mailboxCheckMaxPerRun": {
+            "title": "Max mailbox checks per run",
+            "type": "integer",
+            "description": "Hard cap on MillionVerifier calls per run (protects your vendor credits).",
+            "default": 1000,
             "minimum": 1,
             "maximum": 100000
         }

@@ -44,14 +44,14 @@ function createServer(): McpServer {
                 'COST: paid (billed to your Apify account, pay-per-event): $0.00005 per run + $0.00079 per email row with a verdict; error rows are free. 100 emails ~ $0.08.',
                 'RETURNS: {count, items}. email rows: input, email, domain, verdict (valid | risky | invalid | unknown), reasons[] (INVALID_SYNTAX, DOMAIN_NOT_FOUND, NULL_MX, NO_MAIL_SERVER -> invalid; DISPOSABLE_DOMAIN, ROLE_ACCOUNT, FREE_PROVIDER, POSSIBLE_TYPO, IMPLICIT_MX_ONLY -> risky depending on allow* flags; DNS_NOT_CHECKED -> unknown), syntax_valid, is_disposable, is_role_account, is_free_provider, did_you_mean, domain_exists, has_mx, mx_records, mail_provider, has_spf, has_dmarc, dmarc_policy, source_url, checked_at. error rows: code (INPUT_EMPTY, MAX_EMAILS_EXCEEDED, DNS_LOOKUP_FAILED), message, retryable.',
                 'PARAMETERS: emails: entries are split on commas, semicolons and newlines, trimmed, reduced from "Name <addr>" to addr, and case-insensitive duplicates are skipped before checking, so a pasted list in one element works and you pay once per unique address; maxEmails caps that unique count (extras get one free MAX_EMAILS_EXCEEDED row), which makes it your spend cap. checkDns=false skips all DNS lookups: domain_exists / has_mx stay null and an address that is otherwise clean gets verdict "unknown" (DNS_NOT_CHECKED) instead of "valid" - it is still billed. checkSpfDmarc only adds has_spf / has_dmarc / dmarc_policy and never changes the verdict; it is ignored when checkDns=false. The three allow* flags only decide whether a condition downgrades an otherwise valid address to "risky": the reason code (ROLE_ACCOUNT, DISPOSABLE_DOMAIN, FREE_PROVIDER) is listed in reasons[] either way, and no flag can rescue an "invalid" address (bad syntax, DOMAIN_NOT_FOUND, NULL_MX, NO_MAIL_SERVER). POSSIBLE_TYPO and IMPLICIT_MX_ONLY are always "risky". Presets: B2B lead list = allowFreeProviders false + allowRoleAccounts false; consumer signups = defaults.',
-                'EXAMPLE: {"emails":["someone@gmial.com"]} -> verdict "risky", reasons ["POSSIBLE_TYPO"], did_you_mean "someone@gmail.com".',
+                'EXAMPLE: {"emails":["someone@gamil.com"]} -> verdict "risky", reasons ["POSSIBLE_TYPO"], did_you_mean "someone@gmail.com".',
             ].join('\n'),
             inputSchema: {
                 emails: z
                     .array(z.string().min(1))
                     .min(1)
                     .max(10000)
-                    .describe('Required. 1-10000 email addresses to validate. Entries may also be comma/semicolon/newline-separated lists or "Name <addr>" forms. Example: ["john.doe@gmail.com","someone@gmial.com"]'),
+                    .describe('Required. 1-10000 email addresses to validate. Entries may also be comma/semicolon/newline-separated lists or "Name <addr>" forms. Example: ["john.doe@gmail.com","someone@gamil.com"]'),
                 checkDns: z
                     .boolean()
                     .optional()

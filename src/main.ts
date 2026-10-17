@@ -79,7 +79,8 @@ if (!emails.length) {
         message: 'Input.emails must contain at least one email address.',
         retryable: false,
     });
-    await finish();
+    // Fail fast: never fall back to sample input; error rows are not charged.
+    await finish({ exitCode: 1, statusMessage: 'INPUT_EMPTY: emails is required' });
 }
 
 log.info('Email validator starting', { emails: emails.length, checkDns: input.checkDns });
@@ -175,7 +176,7 @@ for (const { raw, p } of parsed) {
 log.info('Email validator finished', { ...counters, verdictCounts });
 await finish();
 
-async function finish(): Promise<never> {
+async function finish(exitOptions?: { exitCode: number; statusMessage: string }): Promise<never> {
     const summary: RunSummary = {
         schema_version: SCHEMA_VERSION,
         started_at: startedAt,
@@ -188,7 +189,7 @@ async function finish(): Promise<never> {
     };
     await emitter.flush();
     await Actor.setValue('RUN_SUMMARY', summary);
-    await Actor.exit();
+    await Actor.exit(exitOptions);
     return undefined as never;
 }
 

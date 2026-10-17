@@ -10,7 +10,7 @@
             "type": "array",
             "editor": "stringList",
             "description": "Email addresses to validate. Entries may also be comma/semicolon/newline separated lists or 'Name <addr>' forms.",
-            "default": [
+            "prefill": [
                 "john.doe@gmail.com",
                 "info@apify.com",
                 "someone@gmial.com",
@@ -18,7 +18,7 @@
                 "not-an-email",
                 "user@this-domain-does-not-exist-fq123.com"
             ],
-            "prefill": [
+            "example": [
                 "john.doe@gmail.com",
                 "info@apify.com",
                 "someone@gmial.com",

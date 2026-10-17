@@ -184,6 +184,10 @@ export function parseEmail(raw: string): ParsedEmail | null {
 }
 
 export function isDisposable(domain: string): boolean {
+    // Upstream disposable lists include typo-squats of major providers (gmial.com, hotmial.com...).
+    // Those are typos, not throwaway inboxes: report POSSIBLE_TYPO via suggestDomain instead.
+    const sug = suggestDomain(domain);
+    if (sug && FREE_PROVIDERS.has(sug)) return false;
     const parts = domain.split('.');
     for (let i = 0; i < parts.length - 1; i++) {
         if (DISPOSABLE_DOMAINS.has(parts.slice(i).join('.'))) return true;

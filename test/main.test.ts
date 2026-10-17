@@ -140,3 +140,10 @@ describe('dns', () => {
         expect(ok).toMatchObject({ spf: true, dmarc: true, dmarcPolicy: 'reject', implicitMx: false });
     });
 });
+
+describe('typo domains of major providers', () => {
+    it.each(['gmial.com', 'gmal.com', 'hotmial.com', 'yaho.com'])('%s is a typo, not disposable', (d) => {
+        expect(isDisposable(d)).toBe(false);
+        expect(suggestDomain(d)).toMatch(/^(gmail|hotmail|yahoo)\.com$/);
+    });
+});

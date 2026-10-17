@@ -1,6 +1,6 @@
 {
     "name": "email-validator-mx-disposable",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "type": "module",
     "description": "Email validation (syntax, MX, disposable) for AI agents (Fairquery).",
     "engines": {

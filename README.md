@@ -22,7 +22,7 @@ Do **not** use it to confirm a specific mailbox exists — that requires SMTP pr
 | --- | --- |
 | Syntax | RFC 5321/5322 pragmatic subset, IDN domains → punycode |
 | MX / A / AAAA / TXT | DNS-over-HTTPS `https://cloudflare-dns.com/dns-query` (cached per domain, 10 domains in parallel) |
-| Disposable domains | Bundled CC0 list from `disposable-email-domains` (~9.9k domains, subdomains matched) |
+| Disposable domains | Bundled CC0 list from `disposable-email-domains` (9,800+ domains, subdomains matched) |
 | Role / free provider / typo | Built-in lists + edit-distance against popular providers |
 
 ## Input

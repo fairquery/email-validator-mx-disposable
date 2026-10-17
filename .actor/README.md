@@ -1,6 +1,6 @@
 # Email Validator for Agents (MX, Disposable, Typo)
 
-**Validates email addresses without sending mail (syntax, MX, disposable, role, typo, SPF/DMARC) for $2 per 1,000 emails.** You pay $0.002 per email row with a verdict, and error rows are free. Example: checking 5,000 signup emails costs 5,000 × $0.002 = **$10.00**, plus Apify's $0.00005 Actor-start fee.
+**Validates email addresses without sending mail (syntax, MX, disposable, role, typo, SPF/DMARC) for $0.79 per 1,000 emails.** You pay $0.00079 per email row with a verdict, and error rows are free. Example: checking 5,000 signup emails costs 5,000 × $0.00079 = **$3.95**, plus Apify's $0.00005 Actor-start fee.
 
 **Fairquery** Apify Actor that validates email addresses **without sending any email or probing SMTP servers**: syntax, DNS/MX, null MX, disposable-domain and role-account detection, free-provider flag, typo suggestions ("gmial.com" → "gmail.com"), mail provider, and SPF/DMARC. Each address gets a clear **`valid` / `risky` / `invalid` / `unknown`** verdict with machine-readable reason codes.
 
@@ -74,12 +74,12 @@ Key-value store record **`RUN_SUMMARY`**: emails checked, duplicates skipped, ve
 
 | Event | Price | When |
 | --- | --- | --- |
-| `email-checked` | $0.002 | Each email row with a verdict (`valid`, `risky`, `invalid` or `unknown`) |
+| `email-checked` | $0.00079 | Each email row with a verdict (`valid`, `risky`, `invalid` or `unknown`) |
 | `apify-actor-start` | $0.00005 | Once per run, per GB of memory (Apify default event) |
 
 Error rows (for example `DNS_LOOKUP_FAILED`) are **never charged**. Duplicate addresses are skipped and not charged. Malformed addresses still get an `invalid` verdict row, and that row is charged like any other check.
 
-**Worked example:** 5,000 addresses with 200 duplicates and 30 DNS failures: (5,000 − 200 − 30) × $0.002 = 4,770 × $0.002 = **$9.54**, plus $0.00005.
+**Worked example:** 5,000 addresses with 200 duplicates and 30 DNS failures: (5,000 − 200 − 30) × $0.00079 = 4,770 × $0.00079 = **$3.77**, plus $0.00005.
 
 To cap spend, set a maximum cost per run in the run options; the Actor stops cleanly at the limit. `maxEmails` caps how many addresses one run checks. Prices are from the Store pricing tab (October 2026).
 
@@ -126,7 +126,7 @@ No. It means the address is well-formed and its domain can receive mail, with no
 
 **How much does a run cost?**
 
-$0.002 per email row with a verdict, plus a $0.00005 start fee. 1,000 emails ≈ $2.00. Error rows and skipped duplicates are free.
+$0.00079 per email row with a verdict, plus a $0.00005 start fee. 1,000 emails ≈ $0.79. Error rows and skipped duplicates are free.
 
 **How do I limit spend?**
 
@@ -144,12 +144,12 @@ Results are written only to your run's dataset and `RUN_SUMMARY` in your Apify a
 
 Other Fairquery tools on the Apify Store. Each one returns structured rows with machine-readable error codes, and error rows are never charged:
 
-- [Website Contact & Company Enricher](https://apify.com/fairquery/website-contact-company-enricher): domain in, public business emails, phones, socials and company details out; $4 per 1,000 domains
-- [Website Tech, SEO & llms.txt Check for Agents](https://apify.com/fairquery/website-tech-seo-ai-readiness): tech stack, SEO score, AI-crawler rules and llms.txt per site; $2 per 1,000 sites
-- [Sanctions & Watchlist Screener (OFAC, EU, UK, UN)](https://apify.com/fairquery/sanctions-watchlist-screener): fuzzy name screening against official sanctions lists; $5 per 1,000 names
-- [LLM Data Guard: PII & Secret Redactor](https://apify.com/fairquery/llm-data-guard-pii-secrets): redact PII and secrets before text reaches an LLM; $3 per 1,000 documents + $0.50 per 1,000 findings
-- [Dependency Vulnerability Check for Agents](https://apify.com/fairquery/osv-dependency-vulnerability-check): packages and lockfiles against OSV.dev; $0.90 per 1,000 packages + $2.80 per 1,000 vulnerabilities
-- [EDGAR Company Facts & Filings for Agents](https://apify.com/fairquery/edgar-company-facts-filings): SEC filings and XBRL facts by ticker, CIK or name; from $2 per 1,000 companies
+- [Website Contact & Company Enricher](https://apify.com/fairquery/website-contact-company-enricher): domain in, public business emails, phones, socials and company details out; $3 per 1,000 domains
+- [Website Tech, SEO & llms.txt Check for Agents](https://apify.com/fairquery/website-tech-seo-ai-readiness): tech stack, SEO score, AI-crawler rules and llms.txt per site; $1.50 per 1,000 sites
+- [Sanctions & Watchlist Screener (OFAC, EU, UK, UN)](https://apify.com/fairquery/sanctions-watchlist-screener): fuzzy name screening against official sanctions lists; $3 per 1,000 names + $0.007 per run
+- [LLM Data Guard: PII & Secret Redactor](https://apify.com/fairquery/llm-data-guard-pii-secrets): redact PII and secrets before text reaches an LLM; $1.50 per 1,000 documents + $0.20 per 1,000 findings
+- [Dependency Vulnerability Check for Agents](https://apify.com/fairquery/osv-dependency-vulnerability-check): packages and lockfiles against OSV.dev; $0.50 per 1,000 packages + $1.50 per 1,000 vulnerabilities
+- [EDGAR Company Facts & Filings for Agents](https://apify.com/fairquery/edgar-company-facts-filings): SEC filings and XBRL facts by ticker, CIK or name; from $1.50 per 1,000 companies
 - **MCP server** [`@fairquery/agent-trust-mcp`](https://www.npmjs.com/package/@fairquery/agent-trust-mcp): one MCP server for Claude Desktop, Cursor and VS Code (`npx -y @fairquery/agent-trust-mcp`). It has 7 free tools that need no token, plus paid tools that call the PII, email, sanctions and OSV Actors with your own Apify token.
 
 All Fairquery Actors: https://apify.com/fairquery

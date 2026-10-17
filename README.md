@@ -1,5 +1,7 @@
 # Email Validator for Agents (MX, Disposable, Typo)
 
+**Validates email addresses without sending mail (syntax, MX, disposable, role, typo, SPF/DMARC) for $2 per 1,000 emails.** You pay $0.002 per email row with a verdict, and error rows are free. Example: checking 5,000 signup emails costs 5,000 × $0.002 = **$10.00**, plus Apify's $0.00005 Actor-start fee.
+
 **Fairquery** Apify Actor that validates email addresses **without sending any email or probing SMTP servers**: syntax, DNS/MX, null MX, disposable-domain and role-account detection, free-provider flag, typo suggestions ("gmial.com" → "gmail.com"), mail provider, and SPF/DMARC. Each address gets a clear **`valid` / `risky` / `invalid` / `unknown`** verdict with machine-readable reason codes.
 
 ## When to use this Actor (LLM / tool selection)
@@ -27,7 +29,7 @@ Do **not** use it to confirm a specific mailbox exists — that requires SMTP pr
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
-| `emails` | `string[]` | 6 sample addresses | Addresses; entries may be comma/semicolon/newline lists or `Name <addr>` |
+| `emails` | `string[]` | – (required; 6 sample addresses are prefilled in the Console form) | Addresses; entries may be comma/semicolon/newline lists or `Name <addr>` |
 | `checkDns` | `bool` | `true` | MX/A lookups (turn off for syntax-only) |
 | `checkSpfDmarc` | `bool` | `true` | Report SPF/DMARC presence and DMARC policy |
 | `allowRoleAccounts` | `bool` | `true` | If `false`, role addresses → `risky` |
@@ -70,11 +72,20 @@ Key-value store record **`RUN_SUMMARY`**: emails checked, duplicates skipped, ve
 
 ## Pricing
 
-Pay per event: `email-checked` per email row. Error rows are never charged. See the Store pricing tab.
+| Event | Price | When |
+| --- | --- | --- |
+| `email-checked` | $0.002 | Each email row with a verdict (`valid`, `risky`, `invalid` or `unknown`) |
+| `apify-actor-start` | $0.00005 | Once per run, per GB of memory (Apify default event) |
+
+Error rows (for example `DNS_LOOKUP_FAILED`) are **never charged**. Duplicate addresses are skipped and not charged. Malformed addresses still get an `invalid` verdict row, and that row is charged like any other check.
+
+**Worked example:** 5,000 addresses with 200 duplicates and 30 DNS failures: (5,000 − 200 − 30) × $0.002 = 4,770 × $0.002 = **$9.54**, plus $0.00005.
+
+To cap spend, set a maximum cost per run in the run options; the Actor stops cleanly at the limit. `maxEmails` caps how many addresses one run checks. Prices are from the Store pricing tab (October 2026).
 
 ## Memory / runtime
 
-Default **256 MB**. No browser, no proxy. ~1,000 emails across a few hundred domains finish in well under a minute.
+Default **128 MB**. No browser, no proxy. About 1,000 emails across a few hundred domains usually finish in under a minute. DNS lookups are cached per domain, 10 domains in parallel.
 
 ## MCP / Apify tools
 
@@ -102,18 +113,62 @@ APIFY_TOKEN=... node scripts/smoke-test.mjs --call   # real tool call
 
 Docker: `docker build -t fairquery-email-mcp .` (the repo-root `Dockerfile` builds this MCP server and is what Glama uses; the Apify Actor image is built from `.actor/Dockerfile`). `glama.json` lists `fairquery` as maintainer.
 
-## Links
+## Works well after
 
-- Apify Store: https://apify.com/fairquery/email-validator-mx-disposable
-- License: MIT
+- [Google Maps Scraper](https://apify.com/compass/crawler-google-places), [Contact Details Scraper](https://apify.com/vdrmota/contact-info-scraper) or [Website Contact & Company Enricher](https://apify.com/fairquery/website-contact-company-enricher): pass the emails they find into `emails` to drop dead domains, disposable inboxes and typos before outreach.
+- Before a CRM import or a newsletter send: run your export through this Actor and drop `invalid` rows. Review the `risky` rows by hand.
+- Then screen the people or companies with the [Sanctions & Watchlist Screener](https://apify.com/fairquery/sanctions-watchlist-screener) if you onboard customers or suppliers.
 
-## Local development
+## Troubleshooting
 
-```bash
-npm install
-npx apify run      # uses input defaults, or storage/key_value_stores/default/INPUT.json
-npm test
-```
+| Symptom | Cause and fix |
+| --- | --- |
+| Run fails at once with `INPUT_EMPTY` | `emails` was empty. The sample addresses in the Console form are prefill only. They are not sent with API calls, so an empty API call fails fast and costs nothing. |
+| Some rows are `DNS_LOOKUP_FAILED` errors | The DNS-over-HTTPS lookup failed or timed out (`retryable: true`). These rows are free; re-run just those addresses. |
+| `MAX_EMAILS_EXCEEDED` error row | More addresses than `maxEmails`. Only the first `maxEmails` were checked; raise the cap or split the list. |
+| Fewer rows than input lines | Duplicates (case-insensitive) are skipped and counted in `RUN_SUMMARY`. One entry can hold several addresses (comma, semicolon or newline separated). |
+| A `valid` address bounced | `valid` means well-formed, the domain receives mail, and no risk flags. It does not confirm the mailbox exists, because the Actor does no SMTP probing. |
+| Free webmail marked `risky` | `allowFreeProviders` is `false`. Set it to `true` for B2C lists. |
+
+## FAQ
+
+**Does it send email or connect to mail servers?**
+
+No. It uses DNS-over-HTTPS lookups (MX, A/AAAA, TXT) and bundled lists only. There is no SMTP handshake and nothing is sent to the address.
+
+**Does `valid` mean the mailbox exists?**
+
+No. It means the address is well-formed and its domain can receive mail, with no disposable, role or typo flags (depending on your `allow*` settings). Mailbox-level checks need SMTP probing, which this Actor avoids for privacy and IP-reputation reasons.
+
+**How much does a run cost?**
+
+$0.002 per email row with a verdict, plus a $0.00005 start fee. 1,000 emails ≈ $2.00. Error rows and skipped duplicates are free.
+
+**How do I limit spend?**
+
+Set a maximum cost per run in the run options (the Actor stops cleanly at the limit) and/or lower `maxEmails`.
+
+**Can an AI agent call it?**
+
+Yes: through [Apify MCP](https://mcp.apify.com) with Actor `fairquery/email-validator-mx-disposable`, or through the Fairquery MCP server (`npx -y @fairquery/agent-trust-mcp`). Its free `email_check_syntax` tool runs locally; `email_validate_deliverability` calls this Actor.
+
+**Is my list stored?**
+
+Results are written only to your run's dataset and `RUN_SUMMARY` in your Apify account; the Actor keeps no other copy. Only domain names (not full addresses) are sent to the Cloudflare DNS-over-HTTPS resolver.
+
+## Fairquery family
+
+Other Fairquery tools on the Apify Store. Each one returns structured rows with machine-readable error codes, and error rows are never charged:
+
+- [Website Contact & Company Enricher](https://apify.com/fairquery/website-contact-company-enricher): domain in, public business emails, phones, socials and company details out; $4 per 1,000 domains
+- [Website Tech, SEO & llms.txt Check for Agents](https://apify.com/fairquery/website-tech-seo-ai-readiness): tech stack, SEO score, AI-crawler rules and llms.txt per site; $2 per 1,000 sites
+- [Sanctions & Watchlist Screener (OFAC, EU, UK, UN)](https://apify.com/fairquery/sanctions-watchlist-screener): fuzzy name screening against official sanctions lists; $5 per 1,000 names
+- [LLM Data Guard: PII & Secret Redactor](https://apify.com/fairquery/llm-data-guard-pii-secrets): redact PII and secrets before text reaches an LLM; $3 per 1,000 documents + $0.50 per 1,000 findings
+- [Dependency Vulnerability Check for Agents](https://apify.com/fairquery/osv-dependency-vulnerability-check): packages and lockfiles against OSV.dev; $0.90 per 1,000 packages + $2.80 per 1,000 vulnerabilities
+- [EDGAR Company Facts & Filings for Agents](https://apify.com/fairquery/edgar-company-facts-filings): SEC filings and XBRL facts by ticker, CIK or name; from $2 per 1,000 companies
+- **MCP server** [`@fairquery/agent-trust-mcp`](https://www.npmjs.com/package/@fairquery/agent-trust-mcp): one MCP server for Claude Desktop, Cursor and VS Code (`npx -y @fairquery/agent-trust-mcp`). It has 7 free tools that need no token, plus paid tools that call the PII, email, sanctions and OSV Actors with your own Apify token.
+
+All Fairquery Actors: https://apify.com/fairquery
 
 ## Kits & templates
 
@@ -127,3 +182,14 @@ Optional guides from Fairquery for wiring this Actor into agents and automations
 ## Disclaimer
 
 DNS-based validation cannot guarantee a mailbox exists or accepts mail. Use results to reduce bounces, not as proof of deliverability. Comply with anti-spam law (CAN-SPAM, GDPR/ePrivacy) when emailing.
+
+## Links
+
+- Apify Store: https://apify.com/fairquery/email-validator-mx-disposable
+- GitHub: https://github.com/fairquery/email-validator-mx-disposable
+- Contact: fairquery@proton.me
+- License: MIT
+
+## Development
+
+Local development, tests and deployment notes are in [DEVELOPMENT.md](./DEVELOPMENT.md). The Apify Store README is [`.actor/README.md`](./.actor/README.md).

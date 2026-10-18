@@ -308,6 +308,7 @@ DNS- and registry-based validation cannot guarantee that a mailbox exists or acc
 
 ## Links
 
+- Guide: [How to validate email addresses via API: MX, disposable and typo checks](https://fairquery.github.io/posts/validate-email-addresses-api-mx-disposable-typo/)
 - Apify Store: https://apify.com/fairquery/email-validator-mx-disposable
 - GitHub: https://github.com/fairquery/email-validator-mx-disposable
 - Contact: fairquery@proton.me

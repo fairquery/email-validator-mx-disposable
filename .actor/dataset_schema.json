@@ -1,0 +1,396 @@
+{
+    "$schema": "https://apify.com/schemas/v1/dataset.ide.json",
+    "actorSpecification": 1,
+    "fields": {
+        "type": "object",
+        "properties": {
+            "schema_version": {
+                "type": "string",
+                "title": "Schema version",
+                "example": "1.0.0"
+            },
+            "type": {
+                "type": "string",
+                "title": "Row type",
+                "enum": [
+                    "email",
+                    "error"
+                ]
+            },
+            "source_url": {
+                "type": "string",
+                "title": "Source URL",
+                "description": "DNS-over-HTTPS query URL (or RFC for syntax-only rows)."
+            },
+            "checked_at": {
+                "type": "string",
+                "title": "Checked at"
+            },
+            "input": {
+                "type": "string",
+                "title": "Input"
+            },
+            "email": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Normalized email"
+            },
+            "local_part": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Local part"
+            },
+            "domain": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Domain"
+            },
+            "verdict": {
+                "type": "string",
+                "title": "Verdict",
+                "enum": [
+                    "valid",
+                    "risky",
+                    "invalid",
+                    "unknown"
+                ]
+            },
+            "reasons": {
+                "type": "array",
+                "title": "Reason codes"
+            },
+            "syntax_valid": {
+                "type": "boolean",
+                "title": "Syntax valid"
+            },
+            "is_disposable": {
+                "type": "boolean",
+                "title": "Disposable"
+            },
+            "is_role_account": {
+                "type": "boolean",
+                "title": "Role account"
+            },
+            "is_free_provider": {
+                "type": "boolean",
+                "title": "Free provider"
+            },
+            "did_you_mean": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Did you mean"
+            },
+            "domain_exists": {
+                "type": [
+                    "boolean",
+                    "null"
+                ],
+                "title": "Domain exists"
+            },
+            "has_mx": {
+                "type": [
+                    "boolean",
+                    "null"
+                ],
+                "title": "Has MX"
+            },
+            "null_mx": {
+                "type": "boolean",
+                "title": "Null MX"
+            },
+            "implicit_mx": {
+                "type": "boolean",
+                "title": "Implicit MX (A record only)"
+            },
+            "mx_records": {
+                "type": "array",
+                "title": "MX records"
+            },
+            "mail_provider": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Mail provider"
+            },
+            "has_spf": {
+                "type": [
+                    "boolean",
+                    "null"
+                ],
+                "title": "Has SPF"
+            },
+            "has_dmarc": {
+                "type": [
+                    "boolean",
+                    "null"
+                ],
+                "title": "Has DMARC"
+            },
+            "dmarc_policy": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "DMARC policy"
+            },
+            "risk_score": {
+                "type": "integer",
+                "title": "Risk score v2 (0-100, higher = riskier)",
+                "description": "Heuristic pre-send risk score. No SMTP probing; not a mailbox verification."
+            },
+            "risk_level": {
+                "type": "string",
+                "title": "Risk level",
+                "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                ]
+            },
+            "risk_reasons": {
+                "type": "array",
+                "title": "Risk reason codes"
+            },
+            "risk_score_version": {
+                "type": "integer",
+                "title": "Risk score version"
+            },
+            "mail_provider_id": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Mail provider id"
+            },
+            "mx_provider_class": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "MX provider type",
+                "enum": [
+                    "consumer_webmail",
+                    "business_suite",
+                    "security_gateway",
+                    "hosting_or_forwarding",
+                    "disposable_service",
+                    "self_hosted_or_unrecognised",
+                    "none",
+                    null
+                ]
+            },
+            "catch_all_likelihood": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Catch-all likelihood (ESTIMATE)",
+                "description": "Estimate from the MX provider type, not measured. See catch_all_basis.",
+                "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "unknown",
+                    null
+                ]
+            },
+            "catch_all_basis": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Catch-all basis"
+            },
+            "domain_registered_at": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Domain registered at (RDAP)"
+            },
+            "domain_age_days": {
+                "type": [
+                    "integer",
+                    "null"
+                ],
+                "title": "Domain age (days)"
+            },
+            "domain_age_source": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Domain age source (RDAP URL)"
+            },
+            "disposable_infrastructure": {
+                "type": "boolean",
+                "title": "Shares MX with disposable-inbox services"
+            },
+            "disposable_infrastructure_mx": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Matching disposable MX host"
+            },
+            "mailbox_verified": {
+                "type": "boolean",
+                "title": "Mailbox verified",
+                "description": "false unless the optional BYOK MillionVerifier check returned ok or invalid with a live key."
+            },
+            "mailbox_check": {
+                "type": "string",
+                "title": "Mailbox check state",
+                "enum": [
+                    "not_requested",
+                    "checked",
+                    "skipped_invalid",
+                    "skipped_disposable",
+                    "skipped_limit",
+                    "error"
+                ]
+            },
+            "mailbox_status": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Mailbox status (BYOK)",
+                "enum": [
+                    "deliverable",
+                    "undeliverable",
+                    "catch_all",
+                    "disposable",
+                    "unknown",
+                    null
+                ]
+            },
+            "mailbox_provider": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Mailbox check provider"
+            },
+            "mailbox_raw": {
+                "type": [
+                    "object",
+                    "null"
+                ],
+                "title": "Raw MillionVerifier result (no key)"
+            },
+            "mailbox_error": {
+                "type": [
+                    "string",
+                    "null"
+                ],
+                "title": "Mailbox check error code"
+            },
+            "code": {
+                "type": "string",
+                "title": "Error code"
+            },
+            "message": {
+                "type": "string",
+                "title": "Error message"
+            },
+            "retryable": {
+                "type": "boolean",
+                "title": "Retryable"
+            },
+            "context": {
+                "type": "object",
+                "title": "Error context"
+            }
+        },
+        "required": [
+            "schema_version",
+            "type",
+            "source_url",
+            "checked_at"
+        ]
+    },
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "transformation": {
+                "fields": [
+                    "type",
+                    "input",
+                    "verdict",
+                    "reasons",
+                    "did_you_mean",
+                    "mail_provider",
+                    "is_disposable",
+                    "is_role_account",
+                    "is_free_provider",
+                    "risk_score",
+                    "risk_level",
+                    "catch_all_likelihood",
+                    "domain_age_days",
+                    "mailbox_verified",
+                    "code"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "type": {
+                        "label": "Row type"
+                    },
+                    "input": {
+                        "label": "Input"
+                    },
+                    "verdict": {
+                        "label": "Verdict"
+                    },
+                    "reasons": {
+                        "label": "Reason codes"
+                    },
+                    "did_you_mean": {
+                        "label": "Did you mean"
+                    },
+                    "mail_provider": {
+                        "label": "Mail provider"
+                    },
+                    "is_disposable": {
+                        "label": "Disposable"
+                    },
+                    "is_role_account": {
+                        "label": "Role account"
+                    },
+                    "is_free_provider": {
+                        "label": "Free provider"
+                    },
+                    "code": {
+                        "label": "Error code"
+                    },
+                    "risk_score": {
+                        "label": "Risk score"
+                    },
+                    "risk_level": {
+                        "label": "Risk level"
+                    },
+                    "catch_all_likelihood": {
+                        "label": "Catch-all (estimate)"
+                    },
+                    "domain_age_days": {
+                        "label": "Domain age (days)"
+                    },
+                    "mailbox_verified": {
+                        "label": "Mailbox verified"
+                    }
+                }
+            }
+        }
+    }
+}
